@@ -1,0 +1,186 @@
+.grade-panel {
+  width: 80%;
+  max-width: 800px;
+  margin: 0 auto;
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  color: var(--color-text);
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  box-shadow: var(--shadow-md);
+}
+
+/* ── Loading state ──────────────────────────────────── */
+.grade-panel--loading {
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+  gap: 18px;
+  border-top: 2px solid var(--color-primary);
+}
+
+.grade-panel--loading p {
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.grade-spinner {
+  width: 38px;
+  height: 38px;
+  border: 3px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+  box-shadow: 0 0 10px rgba(0, 212, 168, 0.2);
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Score header ───────────────────────────────────── */
+.grade-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.25rem 1.5rem;
+  background: var(--color-surface);
+  border: 2px solid;
+  border-radius: var(--radius-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.grade-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: currentColor;
+  opacity: 0.04;
+  pointer-events: none;
+}
+
+.grade-score-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.grade-score {
+  font-size: 2.8rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  font-family: var(--font-mono);
+}
+
+.grade-level {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.grade-divider {
+  width: 1px;
+  height: 52px;
+  background: var(--color-border);
+}
+
+.grade-feedback-inline {
+  flex: 1;
+  font-size: 0.88rem;
+  line-height: 1.65;
+  color: var(--color-text-secondary);
+}
+
+/* ── Sections ───────────────────────────────────────── */
+.grade-section {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+}
+
+.grade-section--threat {
+  border-left: 3px solid var(--color-warning);
+  background: rgba(245, 158, 11, 0.04);
+}
+
+.grade-section-title {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.grade-section-title--good { color: var(--color-success); }
+.grade-section-title--bad  { color: var(--color-danger); }
+.grade-section--threat .grade-section-title { color: var(--color-warning); }
+
+.grade-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.8;
+  color: var(--color-text);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.grade-section ul li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 2px 0;
+}
+
+.grade-section ul li::before {
+  content: "›";
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.grade-section p {
+  font-size: 0.875rem;
+  line-height: 1.65;
+  color: var(--color-text);
+  margin: 3px 0;
+}
+
+.grade-section p strong { color: var(--color-warning); }
+
+/* ── Continue button ────────────────────────────────── */
+.grade-continue-button {
+  align-self: flex-end;
+  background: var(--color-primary);
+  color: #070b14;
+  border: none;
+  padding: 9px 28px;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: all 0.18s ease;
+  box-shadow: 0 0 14px rgba(0, 212, 168, 0.2);
+}
+
+.grade-continue-button:hover {
+  background: var(--color-primary-hover);
+  box-shadow: 0 0 22px rgba(0, 212, 168, 0.35);
+}
+.grade-continue-button:active { transform: scale(0.97); }

@@ -1,0 +1,9 @@
+.clock-countdown{
+    flex:0.1;
+    align-self:flex-end;
+}
+
+.clock-icon{
+    font-size: 1.6rem;
+    color: green;
+}

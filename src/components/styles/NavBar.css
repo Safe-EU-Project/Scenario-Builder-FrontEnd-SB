@@ -1,0 +1,228 @@
+/* ── Top bar ────────────────────────────────────────── */
+.topbar {
+  height: 58px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 12px rgba(0,0,0,0.3);
+}
+
+/* ── Brand ──────────────────────────────────────────── */
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--color-text);
+}
+
+.topbar-brand-icon {
+  width: 34px;
+  height: 34px;
+  background: var(--color-primary-dim);
+  border: 1px solid rgba(0, 212, 168, 0.3);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  color: var(--color-primary);
+}
+
+.topbar-brand-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.topbar-brand-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+
+.topbar-brand-sub {
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  line-height: 1;
+}
+
+/* ── Right side ─────────────────────────────────────── */
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* ── Live status ────────────────────────────────────── */
+.topbar-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: 99px;
+  padding: 4px 12px;
+}
+
+.topbar-status-text {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--color-success);
+}
+
+/* ── User button ────────────────────────────────────── */
+.topbar-user-wrap {
+  position: relative;
+}
+
+.topbar-user-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 6px 12px 6px 8px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  color: var(--color-text);
+}
+
+.topbar-user-btn:hover {
+  border-color: var(--color-border-hover);
+  background: var(--color-surface-overlay);
+}
+
+.topbar-avatar {
+  width: 28px;
+  height: 28px;
+  background: var(--color-primary);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #070b14;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+}
+
+.topbar-user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+}
+
+.topbar-username {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-text);
+  line-height: 1;
+}
+
+.topbar-role {
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  line-height: 1;
+}
+
+.topbar-chevron {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+
+.topbar-chevron--open { transform: rotate(180deg); }
+
+/* ── Dropdown ───────────────────────────────────────── */
+.topbar-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 220px;
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  z-index: 200;
+  animation: dropdown-in 0.15s ease;
+}
+
+@keyframes dropdown-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.topbar-dropdown-header {
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.topbar-dropdown-name {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.topbar-dropdown-email {
+  font-size: 0.78rem;
+  color: var(--color-text-secondary);
+}
+
+.topbar-dropdown-divider {
+  height: 1px;
+  background: var(--color-border);
+}
+
+.topbar-dropdown-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.65rem 1rem;
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  text-align: left;
+}
+
+.topbar-dropdown-item:hover {
+  background: var(--color-surface-overlay);
+  color: var(--color-text);
+}
+
+.topbar-dropdown-item svg {
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.topbar-dropdown-item--danger:hover {
+  background: var(--color-danger-dim);
+  color: var(--color-danger);
+}

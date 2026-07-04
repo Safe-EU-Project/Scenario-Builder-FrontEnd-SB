@@ -1,0 +1,215 @@
+.debrief-screen {
+  width: 88%;
+  max-width: 860px;
+  margin: 2rem auto;
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-border);
+  border-top: 2px solid var(--color-primary);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem 2rem;
+  color: var(--color-text);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  box-shadow: var(--shadow-lg), 0 0 40px rgba(0, 212, 168, 0.06);
+}
+
+/* ── Loading ────────────────────────────────────────── */
+.debrief-screen--loading {
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  gap: 20px;
+  border-top-color: var(--color-primary);
+}
+
+.debrief-screen--loading p {
+  color: var(--color-text-secondary);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* ── Titles ─────────────────────────────────────────── */
+.debrief-eyebrow {
+  text-align: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: var(--color-primary);
+  text-transform: uppercase;
+  margin-bottom: -0.75rem;
+}
+
+.debrief-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--color-text);
+  letter-spacing: -0.01em;
+}
+
+/* ── Score block ────────────────────────────────────── */
+.debrief-score-block {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  padding: 1.75rem 2rem;
+  border: 2px solid;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  position: relative;
+  overflow: hidden;
+}
+
+.debrief-score-block::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: currentColor;
+  opacity: 0.03;
+  pointer-events: none;
+}
+
+.debrief-score-number {
+  font-size: 4rem;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  font-family: var(--font-mono);
+}
+
+.debrief-score-divider {
+  width: 1px;
+  height: 56px;
+  background: var(--color-border);
+  opacity: 0.6;
+}
+
+.debrief-score-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.debrief-score-level {
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.debrief-score-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+/* ── Summary ────────────────────────────────────────── */
+.debrief-summary {
+  font-size: 0.93rem;
+  line-height: 1.8;
+  color: var(--color-text-secondary);
+  text-align: center;
+  padding: 0 1rem;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 1.5rem;
+}
+
+/* ── Two-column grid ────────────────────────────────── */
+.debrief-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 600px) {
+  .debrief-columns { grid-template-columns: 1fr; }
+}
+
+/* ── Sections ───────────────────────────────────────── */
+.debrief-section {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1.1rem 1.25rem;
+}
+
+.debrief-section h3 {
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  margin-bottom: 12px;
+  background: none;
+  border: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.debrief-section--strengths { border-left: 3px solid var(--color-success); }
+.debrief-section--strengths h3 { color: var(--color-success); }
+
+.debrief-section--gaps { border-left: 3px solid var(--color-danger); }
+.debrief-section--gaps h3 { color: var(--color-danger); }
+
+.debrief-section--recs {
+  border-left: 3px solid var(--color-info);
+  grid-column: 1 / -1;
+}
+.debrief-section--recs h3 { color: var(--color-info); }
+
+.debrief-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.8;
+  color: var(--color-text);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.debrief-section ul li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 2px 0;
+}
+
+.debrief-section ul li::before {
+  content: "›";
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+/* ── Submit button ──────────────────────────────────── */
+.debrief-finish-btn {
+  align-self: center;
+  padding: 11px 44px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  background: var(--color-success);
+  color: #070b14;
+  transition: all 0.18s ease;
+  letter-spacing: 0.04em;
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.25);
+}
+
+.debrief-finish-btn:hover {
+  background: #059669;
+  box-shadow: 0 0 26px rgba(16, 185, 129, 0.4);
+}
+.debrief-finish-btn:active { transform: scale(0.97); }

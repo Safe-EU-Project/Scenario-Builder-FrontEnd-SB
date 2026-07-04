@@ -1,0 +1,11 @@
+.card {
+    background: var(--surface-card);
+    padding: 2rem;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+}
+
+.table-wrapper {
+    background: var(--surface-ground);
+    padding: 1rem;
+}
