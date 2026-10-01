@@ -1,11 +1,13 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
-import { FiFileText, FiLoader, FiLock } from "react-icons/fi";
+import { FiFileText, FiLoader, FiLock, FiPlus, FiEdit3 } from "react-icons/fi";
 import "ag-grid-community/styles/ag-theme-material.css";
 import apiFetch from "../service/api_client";
 import keycloak from "../keycloak";
 import PolicyDraftModal from "./PolicyDraftModal";
+import CreateScenarioModal from "./CreateScenarioModal";
+import ScenarioEditorModal from "./ScenarioEditorModal";
 import "./styles/TrainerScenarios.css";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -26,8 +28,37 @@ function TrainerScenarios() {
   const [loadingDraft, setLoadingDraft] = useState(null); // scenario_id being generated
   const [activeDraft, setActiveDraft] = useState(null);   // draft to show in modal
 
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  // editorTarget: { scenarioId, initialScenario? } — initialScenario present right after creation
+  const [editorTarget, setEditorTarget] = useState(null);
+
   /* stable ref so AG Grid cell renderers always see the latest handler */
   const generateRef = useRef(null);
+  const editRef = useRef(null);
+
+  const refreshStats = useCallback(() => {
+    apiFetch
+      .get("/v1/scenario/trainer/stats")
+      .then((res) => {
+        setRowData(res.data);
+        setFetchError(null);
+      })
+      .catch((err) => {
+        console.error("Failed to load scenarios:", err);
+        const status = err.response?.status;
+        setFetchError(
+          status === 401
+            ? "Not authenticated. Please refresh the page and log in again."
+            : `Could not load scenarios (${status ?? "network error"}).`
+        );
+        setRowData([]);
+      });
+  }, []);
+
+  const openEditor = useCallback((scenarioId) => {
+    setEditorTarget({ scenarioId, initialScenario: null });
+  }, []);
+  editRef.current = openEditor;
 
   const generateDraft = useCallback(async (scenarioId, scenarioName) => {
     if (loadingDraft) return; // prevent double-click
@@ -49,20 +80,21 @@ function TrainerScenarios() {
 
   /* fetch trainer's scenarios with run/trainee stats on mount */
   useEffect(() => {
-    apiFetch
-      .get("/v1/scenario/trainer/stats")
-      .then((res) => setRowData(res.data))
-      .catch((err) => {
-        console.error("Failed to load scenarios:", err);
-        const status = err.response?.status;
-        setFetchError(
-          status === 401
-            ? "Not authenticated. Please refresh the page and log in again."
-            : `Could not load scenarios (${status ?? "network error"}).`
-        );
-        setRowData([]);
-      });
-  }, []);
+    refreshStats();
+  }, [refreshStats]);
+
+  /* called by CreateScenarioModal right after the LLM finishes generating */
+  const handleScenarioCreated = useCallback((newScenario) => {
+    setShowCreateModal(false);
+    refreshStats();
+    // Immediately open the human-in-the-loop editor for review
+    setEditorTarget({ scenarioId: newScenario._id, initialScenario: newScenario });
+  }, [refreshStats]);
+
+  const handleScenarioSaved = useCallback(() => {
+    setEditorTarget(null);
+    refreshStats();
+  }, [refreshStats]);
 
   const columnDefs = useMemo(
     () => [
@@ -122,6 +154,23 @@ function TrainerScenarios() {
         },
       },
       {
+        headerName: "Edit",
+        flex: 1,
+        filter: false,
+        sortable: false,
+        editable: false,
+        floatingFilter: false,
+        cellRenderer: (params) => (
+          <button
+            className="ts-edit-btn"
+            title="Review / edit incidents"
+            onClick={() => editRef.current?.(params.data._id)}
+          >
+            <FiEdit3 /> Edit
+          </button>
+        ),
+      },
+      {
         headerName: "Policy Draft",
         flex: 1,
         filter: false,
@@ -162,7 +211,7 @@ function TrainerScenarios() {
           <FiLock className="ts-access-denied-icon" />
           <h2>Access Restricted</h2>
           <p>
-            The <strong>Policy Drafts</strong> section is only available to
+            The <strong>My Scenarios</strong> section is only available to
             users with the <strong>Trainer</strong> role.
           </p>
           <p className="ts-access-denied-sub">
@@ -182,9 +231,12 @@ function TrainerScenarios() {
           <p className="ts-eyebrow">TRAINER DASHBOARD</p>
           <h1 className="ts-title">My Scenarios</h1>
           <p className="ts-subtitle">
-            Select a scenario and generate a formal policy draft for LEA review.
+            Create AI-generated scenarios, review incidents, and draft formal policies for LEA review.
           </p>
         </div>
+        <button className="btn btn-primary ts-create-btn" onClick={() => setShowCreateModal(true)}>
+          <FiPlus /> Create Scenario
+        </button>
       </div>
 
       {/* ── Error banner ──────────────────────────────────────────── */}
@@ -223,6 +275,24 @@ function TrainerScenarios() {
         <PolicyDraftModal
           draft={activeDraft}
           onClose={() => setActiveDraft(null)}
+        />
+      )}
+
+      {/* ── Create Scenario Modal ────────────────────────────────────── */}
+      {showCreateModal && (
+        <CreateScenarioModal
+          onClose={() => setShowCreateModal(false)}
+          onCreated={handleScenarioCreated}
+        />
+      )}
+
+      {/* ── Scenario Editor Modal (human-in-the-loop) ────────────────── */}
+      {editorTarget && (
+        <ScenarioEditorModal
+          scenarioId={editorTarget.scenarioId}
+          initialScenario={editorTarget.initialScenario}
+          onClose={() => setEditorTarget(null)}
+          onSaved={handleScenarioSaved}
         />
       )}
     </div>

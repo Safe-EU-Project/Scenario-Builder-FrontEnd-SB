@@ -1,0 +1,495 @@
+/* ══════════════════════════════════════════════
+   ScenarioEditorModal — human-in-the-loop editor
+   ══════════════════════════════════════════════ */
+
+.sem-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9100;
+  /* Solid (no backdrop-filter) — blur behind a scrollable list is a known
+     Chromium compositing bug that tears/blanks rows while scrolling. */
+  background: rgba(4, 8, 20, 0.92);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 24px 16px;
+  overflow-y: auto;
+}
+
+.sem-modal {
+  width: 100%;
+  max-width: 760px;
+  max-height: 92vh;
+  margin: auto;
+  background: var(--color-surface, #0d1629);
+  border: 1px solid var(--color-border, #1e3a5f);
+  border-top: 3px solid var(--color-primary, #2dd4bf);
+  border-radius: var(--radius-lg, 12px);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6), 0 0 60px rgba(45, 212, 191, 0.06);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: sem-pop-in 0.18s ease;
+}
+
+@keyframes sem-pop-in {
+  from { opacity: 0; transform: scale(0.98) translateY(6px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ── Header ─────────────────────────────────── */
+.sem-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 24px 14px;
+  border-bottom: 1px solid var(--color-border, #1e3a5f);
+  background: var(--color-surface-elevated, #0f1d35);
+  flex-shrink: 0;
+}
+
+.sem-header-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  min-width: 0;
+}
+
+.sem-header-icon {
+  font-size: 1.45rem;
+  color: var(--color-primary, #2dd4bf);
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
+.sem-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary, #94a3b8);
+  margin-bottom: 3px;
+}
+
+.sem-badge-new {
+  padding: 1px 8px;
+  border-radius: 99px;
+  background: rgba(45, 212, 191, 0.14);
+  color: var(--color-primary, #2dd4bf);
+  font-size: 0.6rem;
+  letter-spacing: 0.06em;
+}
+
+.sem-title {
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: var(--color-text, #e2e8f0);
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.sem-close-btn {
+  background: transparent;
+  color: var(--color-text-muted, #6b7280);
+  border: 1px solid var(--color-border, #1e3a5f);
+  border-radius: 6px;
+  padding: 6px 9px;
+  font-size: 1.05rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.sem-close-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--color-danger, #ef4444);
+  border-color: var(--color-danger, #ef4444);
+}
+
+/* ── Loading ────────────────────────────────── */
+.sem-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 60px 24px;
+  color: var(--color-text-secondary, #94a3b8);
+  font-size: 0.9rem;
+}
+
+@keyframes sem-rotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.sem-spin { animation: sem-rotate 1s linear infinite; }
+
+/* ── Toolbar ────────────────────────────────── */
+.sem-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 24px;
+  border-bottom: 1px solid var(--color-border, #1e3a5f);
+  background: rgba(45, 212, 191, 0.03);
+  flex-shrink: 0;
+}
+
+.sem-count {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-secondary, #94a3b8);
+}
+
+.sem-toolbar-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.sem-toolbar-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  background: transparent;
+  color: var(--color-text-secondary, #94a3b8);
+  border: 1px solid var(--color-border, #1e3a5f);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.sem-toolbar-btn:hover {
+  border-color: var(--color-primary, #2dd4bf);
+  color: var(--color-primary, #2dd4bf);
+}
+
+.sem-toolbar-btn--primary {
+  background: rgba(45, 212, 191, 0.1);
+  color: var(--color-primary, #2dd4bf);
+  border-color: rgba(45, 212, 191, 0.3);
+}
+.sem-toolbar-btn--primary:hover {
+  background: var(--color-primary, #2dd4bf);
+  color: #070b14;
+}
+
+/* ── Body ───────────────────────────────────── */
+.sem-body {
+  padding: 16px 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+/* ── Incident accordion card ───────────────── */
+.sem-incident {
+  background: var(--color-surface-elevated, #0f1d35);
+  border: 1px solid var(--color-border, #1e3a5f);
+  border-radius: var(--radius-md, 8px);
+  overflow: hidden;
+  transition: border-color 0.15s;
+  /* Isolate layout/paint per-row without promoting to a separate GPU
+     compositing layer (transform: translateZ caused row tearing on scroll). */
+  contain: layout paint style;
+}
+
+.sem-incident--open {
+  border-color: rgba(45, 212, 191, 0.3);
+}
+
+.sem-incident-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.sem-incident-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--color-primary-dim, rgba(45,212,191,0.12));
+  color: var(--color-primary, #2dd4bf);
+  font-size: 0.76rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.sem-incident-summary {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sem-incident-title {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--color-text, #e2e8f0);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sem-placeholder-text {
+  color: var(--color-text-muted, #6b7280);
+  font-weight: 400;
+}
+
+.sem-incident-ts {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  font-family: var(--font-mono);
+  color: var(--color-text-muted, #6b7280);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.sem-incident-remove {
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted, #6b7280);
+  cursor: pointer;
+  font-size: 0.95rem;
+  padding: 4px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.sem-incident-remove:hover {
+  color: var(--color-danger, #f43f5e);
+  background: var(--color-danger-dim, rgba(244,63,94,0.12));
+}
+
+.sem-incident-chevron {
+  color: var(--color-text-muted, #6b7280);
+  display: flex;
+  flex-shrink: 0;
+}
+
+/* ── Incident body (expanded) ──────────────── */
+.sem-incident-body {
+  padding: 4px 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border-top: 1px solid var(--color-border, #1e3a5f);
+  padding-top: 14px;
+}
+
+.sem-row {
+  display: flex;
+  gap: 12px;
+}
+
+.sem-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+}
+
+.sem-field--grow {
+  flex: 2;
+}
+
+.sem-field label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-text-secondary, #94a3b8);
+  letter-spacing: 0.02em;
+}
+
+.sem-field input,
+.sem-field textarea {
+  background: var(--color-surface-overlay, #131f36);
+  border: 1px solid var(--color-border, #1e3a5f);
+  border-radius: 6px;
+  color: var(--color-text, #e2e8f0);
+  font-size: 0.84rem;
+  font-family: var(--font-sans);
+  padding: 8px 10px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.sem-field textarea {
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.sem-field input:focus,
+.sem-field textarea:focus {
+  border-color: var(--color-primary, #2dd4bf);
+  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.1);
+}
+
+/* ── Expected actions list ─────────────────── */
+.sem-actions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sem-action-row {
+  display: flex;
+  gap: 6px;
+}
+
+.sem-action-row input {
+  flex: 1;
+}
+
+.sem-action-remove {
+  background: transparent;
+  border: 1px solid var(--color-border, #1e3a5f);
+  border-radius: 6px;
+  color: var(--color-text-muted, #6b7280);
+  cursor: pointer;
+  padding: 0 9px;
+  transition: all 0.15s;
+}
+.sem-action-remove:hover {
+  color: var(--color-danger, #f43f5e);
+  border-color: var(--color-danger, #f43f5e);
+}
+
+.sem-action-add {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  background: transparent;
+  border: 1px dashed var(--color-border-hover, #274266);
+  border-radius: 6px;
+  color: var(--color-text-secondary, #94a3b8);
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-top: 2px;
+}
+.sem-action-add:hover {
+  border-color: var(--color-primary, #2dd4bf);
+  color: var(--color-primary, #2dd4bf);
+}
+
+/* ── Advanced / predictive metadata ────────── */
+.sem-advanced {
+  border: 1px solid var(--color-border, #1e3a5f);
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+
+.sem-advanced summary {
+  cursor: pointer;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--color-text-secondary, #94a3b8);
+  list-style: none;
+}
+.sem-advanced summary::-webkit-details-marker { display: none; }
+.sem-advanced[open] summary {
+  margin-bottom: 10px;
+  color: var(--color-primary, #2dd4bf);
+}
+
+.sem-advanced-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* ── Empty state ────────────────────────────── */
+.sem-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 40px 20px;
+  color: var(--color-text-muted, #6b7280);
+  text-align: center;
+}
+.sem-empty svg { font-size: 1.6rem; }
+
+/* ── Banners ────────────────────────────────── */
+.sem-banner-stack {
+  padding: 0 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.sem-error,
+.sem-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 9px 14px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+.sem-error {
+  background: var(--color-danger-dim, rgba(244,63,94,0.12));
+  border: 1px solid rgba(244, 63, 94, 0.3);
+  color: var(--color-danger, #f43f5e);
+}
+
+.sem-warning {
+  background: var(--color-warning-dim, rgba(245,158,11,0.12));
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: var(--color-warning, #f59e0b);
+}
+
+/* ── Footer ─────────────────────────────────── */
+.sem-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 24px;
+  border-top: 1px solid var(--color-border, #1e3a5f);
+  background: var(--color-surface-elevated, #0f1d35);
+  flex-shrink: 0;
+}
+
+.sem-footer-hint {
+  font-size: 0.78rem;
+  color: var(--color-text-muted, #6b7280);
+}
+
+.sem-footer-actions {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}

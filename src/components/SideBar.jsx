@@ -11,7 +11,7 @@ const baseNavItems = [
   { id: "start-exercise",    path: "/start-exercise",      icon: FiPlay,      label: "Start Exercise",  trainerOnly: false },
   { id: "my-assignments",    path: "/my-assignments",      icon: FiClipboard, label: "My Assignments",  trainerOnly: false },
   { id: "user-stats",        path: "/user-stats",          icon: FiBarChart2, label: "User Analytics",  trainerOnly: false },
-  { id: "trainer-scenarios", path: "/trainer/scenarios",   icon: FiFileText,  label: "Policy Drafts",   trainerOnly: true  },
+  { id: "trainer-scenarios", path: "/trainer/scenarios",   icon: FiFileText,  label: "My Scenarios",    trainerOnly: true  },
   { id: "guide",             path: "/guide",               icon: FiBook,      label: "User Guide",      trainerOnly: false },
 ];
 
