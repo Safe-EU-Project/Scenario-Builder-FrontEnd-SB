@@ -3,10 +3,12 @@ import React, { useState, useMemo, useCallback, useEffect, useRef } from "react"
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { TbBrandGoogleAnalytics } from "react-icons/tb";
+import { FiActivity, FiClipboard } from "react-icons/fi";
 import { Progress } from "flowbite-react";
 import apiFetch from "../service/api_client";
 import AssignmentAnalytics from "./AssignmentAnalytics.jsx";
 import "ag-grid-community/styles/ag-theme-material.css";
+import "./styles/TableAssignment.css";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -120,11 +122,17 @@ function TableAssignment() {
   }), []);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", width: "100%", height: "100%" }}>
-      <div
-        className="ag-theme-material"
-        style={{ width: "98%", height: "400px", margin: "10px", marginTop: "12px", flexShrink: 0 }}
-      >
+    <div className="assignments-page">
+      <header className="assignments-page-header">
+        <div>
+          <p>Performance History</p>
+          <h1>My assignments</h1>
+          <span>Review completed simulations, scores and incident-level decisions.</span>
+        </div>
+        <div className="assignments-page-badge"><FiClipboard /> Exercise record</div>
+      </header>
+
+      <div className="ag-theme-material assignments-grid">
         <AgGridReact
           rowData={rowData}
           columnDefs={columnDefs}
@@ -137,13 +145,13 @@ function TableAssignment() {
       </div>
 
       {loadingDetails && (
-        <div style={{ padding: "24px", textAlign: "center", color: "var(--color-text-muted, #6b7280)" }}>
-          Loading assignment details…
+        <div className="assignments-loading">
+          <FiActivity /> Loading assignment details…
         </div>
       )}
 
       {assignmentData && !loadingDetails && (
-        <div style={{ margin: "0 10px 20px" }}>
+        <div className="assignments-details">
           <AssignmentAnalytics assignmentData={assignmentData} />
         </div>
       )}

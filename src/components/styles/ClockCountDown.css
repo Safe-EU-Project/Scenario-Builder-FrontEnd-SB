@@ -1,9 +1,26 @@
-.clock-countdown{
-    flex:0.1;
-    align-self:flex-end;
+.clock-countdown > div {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--color-text-muted);
+  font-size: 0.58rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
-.clock-icon{
-    font-size: 1.6rem;
-    color: green;
+.clock-countdown > div > div {
+  display: flex;
+  align-items: baseline;
+  gap: 0.15rem;
+}
+
+.clock-countdown .countdown {
+  color: var(--color-text);
+  font: 650 0.73rem/1 var(--font-mono);
+}
+
+.clock-icon {
+  margin-right: 0.15rem;
+  color: var(--color-info);
+  font-size: 1rem;
 }

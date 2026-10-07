@@ -5,14 +5,19 @@ import "./styles/ClockCountDown.css";
 import IncidentCard from "./IncidentCard";
 import GradePanel from "./GradePanel";
 import DebriefScreen from "./DebriefScreen";
-import { Label, Textarea } from "flowbite-react";
+import { Textarea } from "flowbite-react";
 import TableScenario from "./TableScenario";
 import ClockCountDown from "./ClockCountDown";
 import Swal from "sweetalert2";
-import React from "react";
-import keycloak from "../keycloak";
 import apiFetch from "../service/api_client";
-import { gradeStep, nextStep, debrief, toLLMScenario } from "../service/llm_client";
+import {
+  gradeStepStream,
+  nextStep,
+  debrief,
+  exploitPath,
+  toLLMScenario,
+  wakeModel,
+} from "../service/llm_client";
 import { FaCheckCircle } from "react-icons/fa";
 
 export default function SearchExercise({ handleSimulationStart }) {
@@ -39,6 +44,9 @@ export default function SearchExercise({ handleSimulationStart }) {
   const [isLLMLoading, setIsLLMLoading] = useState(false);
   const [debriefData, setDebriefData] = useState(null);
   const [isDebriefLoading, setIsDebriefLoading] = useState(false);
+  const [exploitPathData, setExploitPathData] = useState(null);
+  const [isExploitPathLoading, setIsExploitPathLoading] = useState(false);
+  const [exploitPathError, setExploitPathError] = useState(null);
   const [isComplete, setIsComplete] = useState(false);   // simulation complete flag
 
   const commentRef = useRef();
@@ -59,6 +67,7 @@ export default function SearchExercise({ handleSimulationStart }) {
       const parsedScenario = savedScenario ? JSON.parse(savedScenario) : null;
 
       if (parsedExercise?.context_solution) {
+        wakeModel();
         const context = parsedExercise.context_solution;
         const draftIndices = Object.keys(parsedDraft).map(Number).filter((i) => i < context.length);
 
@@ -117,6 +126,7 @@ export default function SearchExercise({ handleSimulationStart }) {
 
   // ── Start exercise ────────────────────────────────────────────────────────
   async function handleSetExercise(scenarioExercise) {
+    wakeModel();
     try {
       const response = await apiFetch.post("/v1/assignment/trainee/create_assignment", {
         scenario_id: scenarioExercise._id,
@@ -139,6 +149,8 @@ export default function SearchExercise({ handleSimulationStart }) {
       setGradeResult(null);
       setNextStepPrediction(null);
       setDebriefData(null);
+      setExploitPathData(null);
+      setExploitPathError(null);
       setIsComplete(false);
 
       handleSimulationStart();
@@ -192,6 +204,8 @@ export default function SearchExercise({ handleSimulationStart }) {
       setGradeHistory([]);
       setShowGrade(false);
       setDebriefData(null);
+      setExploitPathData(null);
+      setExploitPathError(null);
       setIsComplete(false);
       handleSimulationStart(true);
       closeLoadingPopup();
@@ -261,11 +275,15 @@ export default function SearchExercise({ handleSimulationStart }) {
       // ── Grade + Next Step in parallel ───────────────────────────────────
       const [grade, nextStepResp] = await Promise.all([
         currentIncident && llmScenario
-          ? gradeStep({
+          ? gradeStepStream({
               scenarioTitle: scenario.scenario_name,
               incidentTitle: currentIncident.title,
               expectedActions: currentIncident.expected_actions || [],
               userAction,
+              onFeedback: (feedback) => setGradeResult({ feedback, streaming: true }),
+            }).then((result) => {
+              if (result) setGradeResult({ ...result, streaming: false });
+              return result;
             }).catch((e) => { console.warn("grade_step failed, continuing without grade", e); return null; })
           : Promise.resolve(null),
 
@@ -308,18 +326,34 @@ export default function SearchExercise({ handleSimulationStart }) {
         visited.length + 1 >= (scenario?.context?.length ?? 0);
 
       if (scenarioComplete) {
-        // Generate debrief
+        // Generate the debrief and the T7.4 exploit-path dashboard in parallel.
         setIsDebriefLoading(true);
-        try {
-          if (llmScenario && newGradeHistory.length > 0) {
-            const debriefResp = await debrief({ scenario: llmScenario, history: newGradeHistory });
-            setDebriefData(debriefResp);
-          }
-        } catch (e) {
-          console.warn("debrief failed", e);
-        }
-        setIsDebriefLoading(false);
+        setIsExploitPathLoading(Boolean(llmScenario));
+        setExploitPathError(null);
         setIsComplete(true);
+
+        const debriefPromise =
+          llmScenario && newGradeHistory.length > 0
+            ? debrief({ scenario: llmScenario, history: newGradeHistory })
+                .then(setDebriefData)
+                .catch((e) => console.warn("debrief failed", e))
+                .finally(() => setIsDebriefLoading(false))
+            : Promise.resolve().finally(() => setIsDebriefLoading(false));
+
+        const exploitPromise = llmScenario
+          ? exploitPath({ scenario: llmScenario, useRag: false })
+              .then(setExploitPathData)
+              .catch((e) => {
+                console.warn("exploit path failed", e);
+                setExploitPathError("Attack-path analysis is temporarily unavailable.");
+              })
+              .finally(() => setIsExploitPathLoading(false))
+          : Promise.resolve();
+
+        await Promise.allSettled([debriefPromise, exploitPromise]);
+        if (!llmScenario) {
+          setIsExploitPathLoading(false);
+        }
         return;
       }
 
@@ -401,8 +435,19 @@ export default function SearchExercise({ handleSimulationStart }) {
         incidentIndex < exercise.context_solution.length &&
         !isComplete && (
           <div className="incident-container">
-            <div className="clock-countdown">
-              <ClockCountDown handleTimeFinish={handleTimeIsFinished} />
+            <div className="exercise-statusbar">
+              <div>
+                <span className="exercise-eyebrow">Active simulation</span>
+                <strong>Incident response workspace</strong>
+              </div>
+              <div className="exercise-statusbar-right">
+                <span className="exercise-step">
+                  Incident {incidentIndex + 1} / {exercise.context_solution.length}
+                </span>
+                <div className="clock-countdown">
+                  <ClockCountDown handleTimeFinish={handleTimeIsFinished} />
+                </div>
+              </div>
             </div>
 
             {/* Grade panel (shown after each step while waiting for LLM or after grading) */}
@@ -416,15 +461,14 @@ export default function SearchExercise({ handleSimulationStart }) {
             ) : (
               <>
                 <IncidentCard exercise={exercise.context_solution[incidentIndex]} />
-                <br />
-                <div className="w-[80%] max-w-[800px] flex flex-col">
+                <div className="action-area">
+                  <label className="action-label" htmlFor="comment">Response actions</label>
                   <Textarea
                     ref={commentRef}
                     id="comment"
-                    className="mt-[5px]"
                     placeholder="Describe your response actions…"
                     required
-                    rows={4}
+                    rows={5}
                     onChange={(e) => {
                       const value = e.target.value;
                       commentRef.current.value = value;
@@ -435,37 +479,41 @@ export default function SearchExercise({ handleSimulationStart }) {
                       });
                     }}
                   />
-                  <button className="next-button" onClick={handleNext}>
-                    Next
-                  </button>
-                  <button
-                    className="next-button"
-                    style={{ background: "#6b7280", marginTop: "8px" }}
-                    onClick={() => {
-                      Swal.fire({
-                        title: "Abandon Exercise?",
-                        text: "Your progress will not be saved.",
-                        icon: "warning",
-                        showCancelButton: true,
-                        confirmButtonText: "Yes, exit",
-                        cancelButtonText: "Continue",
-                        confirmButtonColor: "#ef4444",
-                        cancelButtonColor: "#3b82f6",
-                      }).then((result) => {
-                        if (result.isConfirmed) {
-                          localStorage.removeItem("exerciseState");
-                          localStorage.removeItem("exerciseDraft");
-                          localStorage.removeItem("simulationMode");
-                          localStorage.removeItem("exerciseVisited");
-                          localStorage.removeItem("exerciseScenario");
-                          handleSimulationStart(true);
-                          navigate("/");
-                        }
-                      });
-                    }}
-                  >
-                    Exit Exercise
-                  </button>
+                  <div className="button-row">
+                    <button
+                      className="exercise-exit-button"
+                      onClick={() => {
+                        Swal.fire({
+                          title: "Abandon Exercise?",
+                          text: "Your progress will not be saved.",
+                          icon: "warning",
+                          showCancelButton: true,
+                          confirmButtonText: "Yes, exit",
+                          cancelButtonText: "Continue",
+                          confirmButtonColor: "#ef4444",
+                          cancelButtonColor: "#3b82f6",
+                          customClass: {
+                            confirmButton: "swal2-confirm--danger",
+                          },
+                        }).then((result) => {
+                          if (result.isConfirmed) {
+                            localStorage.removeItem("exerciseState");
+                            localStorage.removeItem("exerciseDraft");
+                            localStorage.removeItem("simulationMode");
+                            localStorage.removeItem("exerciseVisited");
+                            localStorage.removeItem("exerciseScenario");
+                            handleSimulationStart(true);
+                            navigate("/");
+                          }
+                        });
+                      }}
+                    >
+                      Exit exercise
+                    </button>
+                    <button className="next-button" onClick={handleNext}>
+                      Submit response
+                    </button>
+                  </div>
                 </div>
               </>
             )}
@@ -480,6 +528,9 @@ export default function SearchExercise({ handleSimulationStart }) {
             <DebriefScreen
               debrief={debriefData}
               isLoading={isDebriefLoading}
+              exploitPath={exploitPathData}
+              isExploitPathLoading={isExploitPathLoading}
+              exploitPathError={exploitPathError}
               onFinish={handleExit}
             />
           ) : (

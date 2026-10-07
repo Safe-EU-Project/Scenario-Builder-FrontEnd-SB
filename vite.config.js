@@ -23,6 +23,8 @@ export default defineConfig(({ mode }) => {
           target: "http://10.240.138.254:9002",
           changeOrigin: true,
           secure: false,
+          timeout: 300000,
+          proxyTimeout: 300000,
           rewrite: (path) => path.replace(/^\/llm/, ""),
           configure: (proxy) => {
             proxy.on("error", (err, req) => {
@@ -31,9 +33,13 @@ export default defineConfig(({ mode }) => {
             proxy.on("proxyReq", (_, req) => {
               console.log(`[proxy] ${req.method} ${req.url}`);
             });
-            proxy.on("proxyRes", (res, req) => {
-              if (res.statusCode >= 400) {
-                console.warn(`[proxy] ${res.statusCode} ${req.url}`);
+            proxy.on("proxyRes", (proxyRes, req, res) => {
+              if ((req.url || "").includes("grade_step_stream")) {
+                res.setHeader("Cache-Control", "no-cache");
+                res.setHeader("X-Accel-Buffering", "no");
+              }
+              if (proxyRes.statusCode >= 400) {
+                console.warn(`[proxy] ${proxyRes.statusCode} ${req.url}`);
               }
             });
           },
@@ -44,6 +50,9 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           secure: false,
           followRedirects: true,
+          // Scenario generation / policy draft can take 1–3 minutes on the GPU LLM.
+          timeout: 300000,
+          proxyTimeout: 300000,
           rewrite: (path) => path.replace(/^\/api/, ""),
           configure: (proxy) => {
             proxy.on("error", (err, req) => {

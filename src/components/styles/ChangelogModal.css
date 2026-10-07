@@ -6,7 +6,7 @@
   position: fixed;
   inset: 0;
   z-index: 9100;
-  background: rgba(5, 10, 24, 0.78);
+  background: var(--color-modal-overlay);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
@@ -20,10 +20,10 @@
   max-height: 82vh;
   background: var(--color-surface, #0d1629);
   border: 1px solid var(--color-border, #1e3a5f);
-  border-top: 3px solid var(--color-primary, #2dd4bf);
+  border-top: 3px solid var(--color-primary, #4f8cff);
   border-radius: var(--radius-lg, 12px);
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6),
-              0 0 40px rgba(45, 212, 191, 0.05);
+              0 0 40px rgba(79, 140, 255, 0.05);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -46,7 +46,7 @@
 }
 
 .cl-header-icon {
-  color: var(--color-primary, #2dd4bf);
+  color: var(--color-primary, #4f8cff);
   font-size: 20px;
   flex-shrink: 0;
 }
@@ -107,9 +107,9 @@
 }
 
 .cl-version-badge {
-  background: rgba(45, 212, 191, 0.12);
-  color: var(--color-primary, #2dd4bf);
-  border: 1px solid rgba(45, 212, 191, 0.25);
+  background: rgba(79, 140, 255, 0.12);
+  color: var(--color-primary, #4f8cff);
+  border: 1px solid rgba(79, 140, 255, 0.25);
   border-radius: 6px;
   font-size: 12px;
   font-weight: 700;
@@ -151,7 +151,7 @@
 
 .cl-section-icon {
   font-size: 13px;
-  color: var(--color-primary, #2dd4bf);
+  color: var(--color-primary, #4f8cff);
 }
 
 /* ── Items ────────────────────────────────────── */
@@ -172,7 +172,7 @@
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 8px;
-  border-left: 2px solid rgba(45, 212, 191, 0.3);
+  border-left: 2px solid rgba(79, 140, 255, 0.3);
 }
 
 .cl-item-heading {

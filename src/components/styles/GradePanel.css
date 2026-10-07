@@ -1,17 +1,35 @@
 .grade-panel {
-  width: 80%;
-  max-width: 800px;
+  width: min(100%, 960px);
   margin: 0 auto;
   background: var(--color-surface-elevated);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: 2rem;
+  border-radius: var(--radius-md);
+  padding: 1.1rem;
   color: var(--color-text);
   display: flex;
   flex-direction: column;
-  gap: 1.1rem;
-  box-shadow: var(--shadow-md);
+  gap: 0.75rem;
+  box-shadow: var(--shadow-sm);
 }
+
+.grade-panel-kicker {
+  padding: 0 0.15rem 0.65rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.grade-panel-kicker span,
+.grade-panel-kicker em {
+  font-size: 0.58rem;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.grade-panel-kicker span { color: var(--color-text-secondary); }
+.grade-panel-kicker em { color: var(--color-primary); font-style: normal; }
 
 /* ── Loading state ──────────────────────────────────── */
 .grade-panel--loading {
@@ -22,12 +40,54 @@
   border-top: 2px solid var(--color-primary);
 }
 
-.grade-panel--loading p {
-  color: var(--color-text-secondary);
-  font-size: 0.85rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+.grade-loading-line {
+  color: var(--color-text);
+  font-size: 1rem;
   font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  min-height: 1.4em;
+  margin: 0;
+}
+
+.grade-caret {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 2px;
+  background: var(--color-primary);
+  vertical-align: text-bottom;
+  animation: grade-caret-blink 0.9s step-end infinite;
+}
+
+.grade-streaming-text {
+  width: 100%;
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.65;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--color-text);
+  white-space: pre-wrap;
+}
+
+.grade-continue-button:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.grade-loading-hint {
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  margin: 0;
+}
+
+@keyframes grade-caret-blink {
+  50% { opacity: 0; }
 }
 
 .grade-spinner {
@@ -37,7 +97,7 @@
   border-top-color: var(--color-primary);
   border-radius: 50%;
   animation: spin 0.75s linear infinite;
-  box-shadow: 0 0 10px rgba(0, 212, 168, 0.2);
+  box-shadow: 0 0 10px rgba(79, 140, 255, 0.2);
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -47,10 +107,11 @@
   display: flex;
   align-items: center;
   gap: 1.5rem;
-  padding: 1.25rem 1.5rem;
+  padding: 1rem 1.1rem;
   background: var(--color-surface);
-  border: 2px solid;
-  border-radius: var(--radius-md);
+  border: 1px solid;
+  border-left-width: 3px;
+  border-radius: var(--radius-sm);
   position: relative;
   overflow: hidden;
 }
@@ -69,11 +130,20 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 2px;
+  min-width: 130px;
+}
+
+.grade-score-caption {
+  color: var(--color-text-muted);
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
 }
 
 .grade-score {
-  font-size: 2.8rem;
-  font-weight: 900;
+  font-size: 2.25rem;
+  font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1;
   font-family: var(--font-mono);
@@ -103,13 +173,13 @@
 .grade-section {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 1rem 1.25rem;
+  border-radius: var(--radius-sm);
+  padding: 0.8rem 0.95rem;
 }
 
 .grade-section--threat {
-  border-left: 3px solid var(--color-warning);
-  background: rgba(245, 158, 11, 0.04);
+  border-left: 2px solid var(--color-warning);
+  background: var(--color-warning-dim);
 }
 
 .grade-section-title {
@@ -117,7 +187,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.14em;
-  margin-bottom: 10px;
+  margin-bottom: 7px;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -132,7 +202,7 @@
   padding: 0;
   margin: 0;
   font-size: 0.875rem;
-  line-height: 1.8;
+  line-height: 1.65;
   color: var(--color-text);
   display: flex;
   flex-direction: column;
@@ -155,7 +225,7 @@
 }
 
 .grade-section p {
-  font-size: 0.875rem;
+  font-size: 0.82rem;
   line-height: 1.65;
   color: var(--color-text);
   margin: 3px 0;
@@ -166,21 +236,33 @@
 /* ── Continue button ────────────────────────────────── */
 .grade-continue-button {
   align-self: flex-end;
+  min-width: 130px;
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
   background: var(--color-primary);
-  color: #070b14;
+  color: #ffffff;
   border: none;
   padding: 9px 28px;
   border-radius: var(--radius-md);
   font-size: 0.875rem;
   font-weight: 700;
   cursor: pointer;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.01em;
   transition: all 0.18s ease;
-  box-shadow: 0 0 14px rgba(0, 212, 168, 0.2);
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.18);
 }
 
 .grade-continue-button:hover {
   background: var(--color-primary-hover);
-  box-shadow: 0 0 22px rgba(0, 212, 168, 0.35);
+  box-shadow: 0 7px 18px rgba(0, 0, 0, 0.24);
 }
 .grade-continue-button:active { transform: scale(0.97); }
+
+@media (max-width: 680px) {
+  .grade-header { align-items: flex-start; flex-direction: column; gap: 0.75rem; }
+  .grade-divider { width: 100%; height: 1px; }
+  .grade-continue-button { width: 100%; }
+}

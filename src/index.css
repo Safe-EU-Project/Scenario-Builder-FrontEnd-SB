@@ -2,57 +2,105 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Design tokens — "Tactical Command" theme ──────── */
+/* ── Design tokens — enterprise security workspace ─── */
 :root {
-  /* Backgrounds — deep navy-black layers */
-  --color-bg:               #070b14;
-  --color-surface:          #0d1424;
-  --color-surface-elevated: #111d30;
-  --color-surface-overlay:  #162035;
+  /* Neutral graphite layers keep dense security data readable. */
+  --color-bg:               #0b0f14;
+  --color-surface:          #10151c;
+  --color-surface-elevated: #161b22;
+  --color-surface-overlay:  #1c2330;
+  --color-surface-soft:     #131922;
+  --color-surface-sunken:   #0e1218;
+  --color-modal-overlay:    rgba(5, 8, 13, 0.9);
 
   /* Borders */
-  --color-border:           #1a2d47;
-  --color-border-hover:     #274266;
-  --color-border-glow:      rgba(0, 212, 168, 0.35);
+  --color-border:           #2a3441;
+  --color-border-hover:     #3b4a5e;
+  --color-border-glow:      rgba(76, 141, 255, 0.3);
 
-  /* Primary — teal */
-  --color-primary:          #00d4a8;
-  --color-primary-dim:      rgba(0, 212, 168, 0.12);
-  --color-primary-hover:    #00b890;
-  --color-primary-glow:     0 0 20px rgba(0, 212, 168, 0.2);
+  /* Primary — restrained enterprise blue */
+  --color-primary:          #4c8dff;
+  --color-primary-dim:      rgba(76, 141, 255, 0.12);
+  --color-primary-hover:    #6ea4ff;
+  --color-primary-glow:     0 0 0 3px rgba(76, 141, 255, 0.14);
+  --color-on-primary:       #ffffff;
 
   /* Status colours */
-  --color-success:          #10b981;
-  --color-success-dim:      rgba(16, 185, 129, 0.12);
-  --color-warning:          #f59e0b;
-  --color-warning-dim:      rgba(245, 158, 11, 0.12);
-  --color-danger:           #f43f5e;
-  --color-danger-dim:       rgba(244, 63, 94, 0.12);
-  --color-info:             #38bdf8;
-  --color-info-dim:         rgba(56, 189, 248, 0.12);
+  --color-success:          #3fa67a;
+  --color-success-dim:      rgba(63, 166, 122, 0.12);
+  --color-warning:          #d7a34a;
+  --color-warning-dim:      rgba(215, 163, 74, 0.12);
+  --color-danger:           #d65f6e;
+  --color-danger-dim:       rgba(214, 95, 110, 0.12);
+  --color-info:             #58a6d6;
+  --color-info-dim:         rgba(88, 166, 214, 0.12);
+  --color-ai:               #8f7aea;
+  --color-ai-dim:           rgba(143, 122, 234, 0.12);
 
   /* Text */
-  --color-text:             #e2eaf5;
-  --color-text-secondary:   #8aa0bc;
-  --color-text-muted:       #4a6380;
-  --color-text-muted-strong:#2d4260;
+  --color-text:             #f4f7fb;
+  --color-text-secondary:   #b3becc;
+  --color-text-muted:       #7e8a9a;
+  --color-text-muted-strong:#566273;
 
   /* Radius */
-  --radius-xs:  4px;
-  --radius-sm:  6px;
-  --radius-md:  10px;
-  --radius-lg:  14px;
-  --radius-xl:  20px;
+  --radius-xs:  3px;
+  --radius-sm:  5px;
+  --radius-md:  7px;
+  --radius-lg:  10px;
+  --radius-xl:  14px;
 
   /* Shadows */
-  --shadow-sm:  0 1px 4px rgba(0,0,0,0.4);
-  --shadow-md:  0 4px 20px rgba(0,0,0,0.5);
-  --shadow-lg:  0 8px 40px rgba(0,0,0,0.6);
-  --shadow-glow:0 0 24px rgba(0, 212, 168, 0.15);
+  --shadow-sm:  0 1px 2px rgba(0,0,0,0.22);
+  --shadow-md:  0 8px 20px rgba(0,0,0,0.22);
+  --shadow-lg:  0 16px 36px rgba(0,0,0,0.3);
+  --shadow-glow:0 0 0 1px rgba(79, 140, 255, 0.12);
 
   /* Typography */
-  --font-sans:  'Inter', 'Segoe UI', system-ui, sans-serif;
-  --font-mono:  'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  --font-sans:  'Segoe UI Variable Text', 'Segoe UI', Inter, system-ui, sans-serif;
+  --font-mono:  'Cascadia Code', 'SFMono-Regular', Consolas, monospace;
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  --color-bg:               #f4f7fb;
+  --color-surface:          #ffffff;
+  --color-surface-elevated: #ffffff;
+  --color-surface-overlay:  #e9eff7;
+  --color-surface-soft:     #f8fafd;
+  --color-surface-sunken:   #eef3f8;
+  --color-modal-overlay:    rgba(23, 32, 51, 0.42);
+
+  --color-border:           #d7dfe9;
+  --color-border-hover:     #aab8c8;
+  --color-border-glow:      rgba(37, 99, 235, 0.24);
+
+  --color-primary:          #2563eb;
+  --color-primary-dim:      rgba(37, 99, 235, 0.09);
+  --color-primary-hover:    #1d4ed8;
+  --color-primary-glow:     0 0 0 3px rgba(37, 99, 235, 0.12);
+
+  --color-success:          #18794e;
+  --color-success-dim:      rgba(24, 121, 78, 0.09);
+  --color-warning:          #9a6700;
+  --color-warning-dim:      rgba(154, 103, 0, 0.09);
+  --color-danger:           #b42335;
+  --color-danger-dim:       rgba(180, 35, 53, 0.09);
+  --color-info:             #176b9c;
+  --color-info-dim:         rgba(23, 107, 156, 0.09);
+  --color-ai:               #6d4ed6;
+  --color-ai-dim:           rgba(109, 78, 214, 0.09);
+
+  --color-text:             #172033;
+  --color-text-secondary:   #465569;
+  --color-text-muted:       #6e7c8f;
+  --color-text-muted-strong:#96a2b1;
+
+  --shadow-sm:  0 1px 3px rgba(23, 32, 51, 0.08);
+  --shadow-md:  0 8px 22px rgba(23, 32, 51, 0.1);
+  --shadow-lg:  0 18px 44px rgba(23, 32, 51, 0.16);
+  --shadow-glow:0 0 0 1px rgba(37, 99, 235, 0.1);
+  color-scheme: light;
 }
 
 /* ── Base ───────────────────────────────────────────── */
@@ -63,16 +111,39 @@ html, body, #root {
   background-color: var(--color-bg);
   color: var(--color-text);
   font-family: var(--font-sans);
-  font-size: 15px;
-  line-height: 1.6;
+  font-size: 14px;
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  overflow: hidden;
+}
+
+button, input, textarea, select {
+  font: inherit;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+}
+
+::selection {
+  color: #ffffff;
+  background: var(--color-primary);
 }
 
 /* ── Typography ─────────────────────────────────────── */
 h1, h2, h3, h4 {
   color: var(--color-text);
-  font-weight: 700;
+  font-weight: 650;
   line-height: 1.25;
   margin: 0;
 }
@@ -112,7 +183,7 @@ code, pre, .mono {
 .badge--warning { background: var(--color-warning-dim); color: var(--color-warning); border-color: rgba(245,158,11,0.3); }
 .badge--danger  { background: var(--color-danger-dim);  color: var(--color-danger);  border-color: rgba(244,63,94,0.3); }
 .badge--info    { background: var(--color-info-dim);    color: var(--color-info);    border-color: rgba(56,189,248,0.3); }
-.badge--primary { background: var(--color-primary-dim); color: var(--color-primary); border-color: rgba(0,212,168,0.3); }
+.badge--primary { background: var(--color-primary-dim); color: var(--color-primary); border-color: rgba(79,140,255,0.3); }
 
 /* ── Cards ──────────────────────────────────────────── */
 .card {
@@ -129,7 +200,7 @@ code, pre, .mono {
 }
 
 .card--glow {
-  border-color: rgba(0, 212, 168, 0.2);
+  border-color: rgba(79, 140, 255, 0.2);
   box-shadow: var(--shadow-glow);
 }
 
@@ -153,12 +224,12 @@ code, pre, .mono {
 
 .btn-primary {
   background: var(--color-primary);
-  color: #070b14;
-  box-shadow: 0 0 14px rgba(0,212,168,0.25);
+  color: #ffffff;
+  box-shadow: 0 5px 14px rgba(0,0,0,0.2);
 }
 .btn-primary:hover {
   background: var(--color-primary-hover);
-  box-shadow: 0 0 20px rgba(0,212,168,0.35);
+  box-shadow: 0 7px 18px rgba(0,0,0,0.26);
 }
 
 .btn-secondary {
@@ -195,8 +266,8 @@ code, pre, .mono {
   --ag-background-color:              var(--color-surface-elevated);
   --ag-header-background-color:       var(--color-surface);
   --ag-odd-row-background-color:      var(--color-surface-elevated);
-  --ag-row-hover-color:               rgba(0, 212, 168, 0.05);
-  --ag-selected-row-background-color: rgba(0, 212, 168, 0.1);
+  --ag-row-hover-color:               rgba(79, 140, 255, 0.05);
+  --ag-selected-row-background-color: rgba(79, 140, 255, 0.1);
   --ag-foreground-color:              var(--color-text);
   --ag-header-foreground-color:       var(--color-text-secondary);
   --ag-border-color:                  var(--color-border);
@@ -226,11 +297,13 @@ nav[class*="navbar"], .navbar, header nav {
 
 /* ── SweetAlert2 dark theme override ───────────────── */
 .swal2-popup {
+  width: min(420px, calc(100vw - 24px)) !important;
+  padding: 1.35rem !important;
   background: var(--color-surface-elevated) !important;
   border: 1px solid var(--color-border) !important;
   border-top: 2px solid var(--color-primary) !important;
-  border-radius: var(--radius-lg) !important;
-  box-shadow: var(--shadow-lg), 0 0 30px rgba(0,212,168,0.08) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-lg) !important;
   font-family: var(--font-sans) !important;
 }
 
@@ -239,6 +312,7 @@ nav[class*="navbar"], .navbar, header nav {
   font-size: 1.15rem !important;
   font-weight: 700 !important;
   letter-spacing: -0.01em !important;
+  padding: 0 !important;
 }
 
 .swal2-html-container,
@@ -246,7 +320,17 @@ nav[class*="navbar"], .navbar, header nav {
 .swal2-text {
   color: var(--color-text-secondary) !important;
   font-size: 0.9rem !important;
+  margin: 0.55rem 0 0 !important;
+  padding: 0 !important;
 }
+
+.swal2-icon {
+  width: 3.4rem !important;
+  height: 3.4rem !important;
+  margin: 0.25rem auto 1rem !important;
+}
+
+.swal2-icon .swal2-icon-content { font-size: 2.2rem !important; }
 
 .swal2-icon.swal2-question {
   border-color: var(--color-primary) !important;
@@ -278,42 +362,51 @@ nav[class*="navbar"], .navbar, header nav {
 
 .swal2-confirm {
   background: var(--color-primary) !important;
-  color: #070b14 !important;
+  color: #ffffff !important;
   font-weight: 700 !important;
   font-size: 0.875rem !important;
   border-radius: var(--radius-md) !important;
   padding: 9px 24px !important;
-  box-shadow: 0 0 12px rgba(0,212,168,0.25) !important;
+  box-shadow: 0 5px 14px rgba(0,0,0,0.2) !important;
   border: none !important;
   transition: all 0.18s ease !important;
 }
 
 .swal2-confirm:hover {
   background: var(--color-primary-hover) !important;
-  box-shadow: 0 0 20px rgba(0,212,168,0.4) !important;
+  box-shadow: 0 7px 18px rgba(0,0,0,0.26) !important;
 }
 
 .swal2-cancel {
-  background: transparent !important;
-  color: var(--color-danger) !important;
+  background: var(--color-surface-overlay) !important;
+  color: var(--color-text-secondary) !important;
   font-weight: 600 !important;
   font-size: 0.875rem !important;
   border-radius: var(--radius-md) !important;
   padding: 9px 24px !important;
-  border: 1px solid rgba(244,63,94,0.35) !important;
+  border: 1px solid var(--color-border) !important;
   transition: all 0.18s ease !important;
 }
 
 .swal2-cancel:hover {
-  background: var(--color-danger-dim) !important;
-  border-color: var(--color-danger) !important;
+  color: var(--color-text) !important;
+  background: var(--color-surface-soft) !important;
+  border-color: var(--color-border-hover) !important;
+}
+
+.swal2-confirm.swal2-confirm--danger {
+  background: var(--color-danger) !important;
+}
+
+.swal2-confirm.swal2-confirm--danger:hover {
+  background: #b94454 !important;
 }
 
 .swal2-loader {
   border-color: var(--color-primary) transparent var(--color-primary) transparent !important;
 }
 
-.swal2-actions { gap: 10px !important; }
+.swal2-actions { gap: 8px !important; margin: 1.15rem 0 0 !important; }
 
 /* ── Pulse animation for live indicators ────────────── */
 @keyframes pulse-glow {

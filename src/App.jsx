@@ -1,5 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useState, useEffect, useRef } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useEffect, useState } from "react";
 import SideBar from "./components/SideBar";
 import NavBar from "./components/NavBar";
 import SearchExercise from "./components/SearchExercise";
@@ -9,17 +9,19 @@ import TrainerScenarios from "./components/TrainerScenarios";
 
 import "./Main.css";
 import HomePage from "./components/HomePage";
+import GuidePage from "./components/GuidePage";
+import NotFoundPage from "./components/NotFoundPage";
 
 function App() {
-  const [simulationMode, setSimulationMode] = useState(false);
-  
-  // Load simulationMode from localStorage on mount
+  const [theme, setTheme] = useState(() => localStorage.getItem("safeTheme") || "dark");
+  const [simulationMode, setSimulationMode] = useState(
+    () => localStorage.getItem("simulationMode") === "true",
+  );
+
   useEffect(() => {
-    const savedMode = localStorage.getItem('simulationMode');
-    if (savedMode === 'true') {
-      setSimulationMode(true);
-    }
-  }, []);
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem("safeTheme", theme);
+  }, [theme]);
 
   const handleSimulationMode = (forceOff = false) => {
     const newMode = forceOff ? false : !simulationMode;
@@ -29,12 +31,15 @@ function App() {
   // const handleSimulationMode = () => {
   //   setSimulationMode(!simulationMode);
   // };
-  const data = [1, 3, 10, 11, 12, 15, 18, 2, 39, 20, 25, 3, 10, 11, 12, 15, 18, 30]; // your numeric list
-  const valueOfInterest = 9; // your target value
   return (
     <BrowserRouter>
       {/* NAVBAR FIXED AT TOP */}
-      {!simulationMode && <NavBar />}
+      {!simulationMode && (
+        <NavBar
+          theme={theme}
+          onToggleTheme={() => setTheme((current) => current === "dark" ? "light" : "dark")}
+        />
+      )}
 
       {/* MAIN PAGE LAYOUT */}
       <div
@@ -58,9 +63,10 @@ function App() {
             />
             <Route path="/" element={<HomePage />} />
             <Route path="/my-assignments" element={<TableAssignment />} />
-            <Route path="/user-stats" element={<UserStats data={data} highlightValue={valueOfInterest} />} />
+            <Route path="/user-stats" element={<UserStats />} />
             <Route path="/trainer/scenarios" element={<TrainerScenarios />} />
-            <Route path="/guide" element={<Navigate to="/" replace />} />
+            <Route path="/guide" element={<GuidePage />} />
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
           {/* <TableScenario data={rows} /> */}
         </div>

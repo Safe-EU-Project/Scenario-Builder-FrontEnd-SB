@@ -5,6 +5,9 @@ import App from "./App.jsx";
 import "./index.css";
 import keycloak from "./keycloak";
 
+const initialTheme = localStorage.getItem("safeTheme") || "dark";
+document.documentElement.dataset.theme = initialTheme;
+
 keycloak
   .init({
     onLoad: "login-required",

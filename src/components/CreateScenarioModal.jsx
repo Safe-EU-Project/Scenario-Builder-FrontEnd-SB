@@ -97,15 +97,31 @@ export default function CreateScenarioModal({ onClose, onCreated }) {
     const instructions = sectorHint ? `${sectorHint}\n\n${description.trim()}` : description.trim();
 
     try {
-      const res = await apiFetch.post("/v1/scenario", {
-        scenario_name: title.trim(),
-        instructions,
-      });
+      const res = await apiFetch.post(
+        "/v1/scenario",
+        {
+          scenario_name: title.trim(),
+          instructions,
+        },
+        { timeout: 300000 }
+      );
       clearInterval(stepTimerRef.current);
-      onCreated(res.data);
+      const created = res.data;
+      const scenarioId = created?._id || created?.id;
+      if (!scenarioId) {
+        throw new Error("Scenario was created but response had no id. Refresh My Scenarios.");
+      }
+      onCreated({ ...created, _id: scenarioId });
     } catch (err) {
       clearInterval(stepTimerRef.current);
-      const detail = err.response?.data?.detail || err.message || "Unknown error";
+      let detail = err.response?.data?.detail || err.message || "Unknown error";
+      if (err.code === "ECONNABORTED" || /timeout/i.test(String(detail))) {
+        detail =
+          "Timed out waiting for the LLM (5 min). The scenario may still have been created — refresh My Scenarios, or try again.";
+      } else if (!err.response && err.message === "Network Error") {
+        detail =
+          "Network error talking to the SAFE backend. Check VPN/network to 10.240.138.254 and try again.";
+      }
       setError(typeof detail === "string" ? detail : JSON.stringify(detail));
       setSubmitting(false);
     }
@@ -199,7 +215,9 @@ export default function CreateScenarioModal({ onClose, onCreated }) {
               <FiLoader className="csm-spin" />
             </div>
             <h3>Generating your scenario…</h3>
-            <p className="csm-generating-sub">This usually takes 15–30 seconds.</p>
+            <p className="csm-generating-sub">
+              Usually 20–60 seconds. Keep this tab open — do not close the modal.
+            </p>
 
             <div className="csm-steps">
               {GENERATION_STEPS.map((step, i) => {
@@ -230,6 +248,11 @@ export default function CreateScenarioModal({ onClose, onCreated }) {
             >
               <FiZap /> Generate Scenario
             </button>
+            {!isValid && (
+              <p className="csm-hint" style={{ margin: 0, width: "100%" }}>
+                Need title ≥ 4 characters and description ≥ 20 characters.
+              </p>
+            )}
           </div>
         )}
       </div>

@@ -8,7 +8,7 @@
   z-index: 9100;
   /* Solid (no backdrop-filter) — blur behind a scrollable list is a known
      Chromium compositing bug that tears/blanks rows while scrolling. */
-  background: rgba(4, 8, 20, 0.92);
+  background: var(--color-modal-overlay);
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -18,14 +18,14 @@
 
 .sem-modal {
   width: 100%;
-  max-width: 760px;
+  max-width: 900px;
   max-height: 92vh;
   margin: auto;
   background: var(--color-surface, #0d1629);
   border: 1px solid var(--color-border, #1e3a5f);
-  border-top: 3px solid var(--color-primary, #2dd4bf);
+  border-top: 3px solid var(--color-primary, #4f8cff);
   border-radius: var(--radius-lg, 12px);
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6), 0 0 60px rgba(45, 212, 191, 0.06);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6), 0 0 60px rgba(79, 140, 255, 0.06);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -58,7 +58,7 @@
 
 .sem-header-icon {
   font-size: 1.45rem;
-  color: var(--color-primary, #2dd4bf);
+  color: var(--color-primary, #4f8cff);
   margin-top: 3px;
   flex-shrink: 0;
 }
@@ -78,8 +78,8 @@
 .sem-badge-new {
   padding: 1px 8px;
   border-radius: 99px;
-  background: rgba(45, 212, 191, 0.14);
-  color: var(--color-primary, #2dd4bf);
+  background: rgba(79, 140, 255, 0.14);
+  color: var(--color-primary, #4f8cff);
   font-size: 0.6rem;
   letter-spacing: 0.06em;
 }
@@ -138,7 +138,7 @@
   gap: 12px;
   padding: 12px 24px;
   border-bottom: 1px solid var(--color-border, #1e3a5f);
-  background: rgba(45, 212, 191, 0.03);
+  background: rgba(79, 140, 255, 0.03);
   flex-shrink: 0;
 }
 
@@ -171,19 +171,152 @@
   transition: all 0.15s;
 }
 .sem-toolbar-btn:hover {
-  border-color: var(--color-primary, #2dd4bf);
-  color: var(--color-primary, #2dd4bf);
+  border-color: var(--color-primary, #4f8cff);
+  color: var(--color-primary, #4f8cff);
 }
 
 .sem-toolbar-btn--primary {
-  background: rgba(45, 212, 191, 0.1);
-  color: var(--color-primary, #2dd4bf);
-  border-color: rgba(45, 212, 191, 0.3);
+  background: rgba(79, 140, 255, 0.1);
+  color: var(--color-primary, #4f8cff);
+  border-color: rgba(79, 140, 255, 0.3);
 }
 .sem-toolbar-btn--primary:hover {
-  background: var(--color-primary, #2dd4bf);
-  color: #070b14;
+  background: var(--color-primary, #4f8cff);
+  color: #ffffff;
 }
+
+/* ── AI provenance ──────────────────────────── */
+.sem-provenance {
+  margin: 10px 24px 0;
+  flex-shrink: 0;
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-border);
+  border-left: 2px solid var(--color-ai);
+  border-radius: var(--radius-sm);
+}
+
+.sem-provenance summary {
+  padding: 0.65rem 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.sem-provenance summary::-webkit-details-marker { display: none; }
+
+.sem-provenance summary > span:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--color-text);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.sem-provenance summary > span:first-child svg { color: var(--color-ai); }
+
+.sem-provenance-body {
+  padding: 0.75rem 0.8rem 0.85rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(250px, 1fr);
+  gap: 0.8rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.sem-provenance-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.45rem;
+}
+
+.sem-provenance-metrics > div {
+  padding: 0.55rem 0.65rem;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.sem-provenance-metrics span,
+.sem-provenance-sources > p {
+  color: var(--color-text-muted);
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.sem-provenance-metrics strong {
+  overflow: hidden;
+  color: var(--color-text);
+  font-size: 0.7rem;
+  text-overflow: ellipsis;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.sem-provenance-sources {
+  padding: 0.55rem 0.65rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.sem-provenance-sources > p { margin-bottom: 0.35rem; }
+
+.sem-provenance-sources > div {
+  padding: 0.27rem 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.sem-provenance-sources > div span {
+  overflow: hidden;
+  color: var(--color-text-secondary);
+  font-size: 0.65rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sem-provenance-sources > div strong {
+  color: var(--color-ai);
+  font: 700 0.63rem/1.4 var(--font-mono);
+}
+
+.sem-provenance-empty {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--color-text-muted);
+  font-size: 0.65rem;
+}
+
+.sem-provenance-empty--legacy {
+  padding: 0.75rem 0.8rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.sem-provenance-warning {
+  grid-column: 1 / -1;
+  padding: 0.55rem 0.65rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  color: var(--color-warning);
+  background: var(--color-warning-dim);
+  border: 1px solid color-mix(in srgb, var(--color-warning) 28%, transparent);
+  border-radius: var(--radius-sm);
+  font-size: 0.65rem;
+  line-height: 1.5;
+}
+
+.sem-provenance-warning svg { margin-top: 0.1rem; flex-shrink: 0; }
 
 /* ── Body ───────────────────────────────────── */
 .sem-body {
@@ -193,6 +326,11 @@
   flex-direction: column;
   gap: 12px;
   flex: 1;
+}
+
+@media (max-width: 680px) {
+  .sem-provenance-body { grid-template-columns: 1fr; }
+  .sem-provenance-metrics { grid-template-columns: 1fr; }
 }
 
 /* ── Incident accordion card ───────────────── */
@@ -208,7 +346,7 @@
 }
 
 .sem-incident--open {
-  border-color: rgba(45, 212, 191, 0.3);
+  border-color: rgba(79, 140, 255, 0.3);
 }
 
 .sem-incident-header {
@@ -227,8 +365,8 @@
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  background: var(--color-primary-dim, rgba(45,212,191,0.12));
-  color: var(--color-primary, #2dd4bf);
+  background: var(--color-primary-dim, rgba(79,140,255,0.12));
+  color: var(--color-primary, #4f8cff);
   font-size: 0.76rem;
   font-weight: 800;
   flex-shrink: 0;
@@ -345,8 +483,8 @@
 
 .sem-field input:focus,
 .sem-field textarea:focus {
-  border-color: var(--color-primary, #2dd4bf);
-  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.1);
+  border-color: var(--color-primary, #4f8cff);
+  box-shadow: 0 0 0 3px rgba(79, 140, 255, 0.1);
 }
 
 /* ── Expected actions list ─────────────────── */
@@ -396,8 +534,8 @@
   margin-top: 2px;
 }
 .sem-action-add:hover {
-  border-color: var(--color-primary, #2dd4bf);
-  color: var(--color-primary, #2dd4bf);
+  border-color: var(--color-primary, #4f8cff);
+  color: var(--color-primary, #4f8cff);
 }
 
 /* ── Advanced / predictive metadata ────────── */
@@ -417,7 +555,7 @@
 .sem-advanced summary::-webkit-details-marker { display: none; }
 .sem-advanced[open] summary {
   margin-bottom: 10px;
-  color: var(--color-primary, #2dd4bf);
+  color: var(--color-primary, #4f8cff);
 }
 
 .sem-advanced-grid {

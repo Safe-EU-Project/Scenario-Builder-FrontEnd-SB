@@ -1,13 +1,28 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
-import { FiFileText, FiLoader, FiLock, FiPlus, FiEdit3 } from "react-icons/fi";
+import {
+  FiActivity,
+  FiAlertTriangle,
+  FiCheckCircle,
+  FiEdit3,
+  FiFileText,
+  FiLayers,
+  FiLoader,
+  FiLock,
+  FiPlus,
+  FiSearch,
+  FiSend,
+  FiUsers,
+} from "react-icons/fi";
 import "ag-grid-community/styles/ag-theme-material.css";
 import apiFetch from "../service/api_client";
 import keycloak from "../keycloak";
 import PolicyDraftModal from "./PolicyDraftModal";
 import CreateScenarioModal from "./CreateScenarioModal";
 import ScenarioEditorModal from "./ScenarioEditorModal";
+import PublishScenarioModal from "./PublishScenarioModal";
+import { PageHeader, ProductButton, StatePanel } from "./ui/ProductUI";
 import "./styles/TrainerScenarios.css";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -27,6 +42,9 @@ function TrainerScenarios() {
   const [fetchError, setFetchError] = useState(null);
   const [loadingDraft, setLoadingDraft] = useState(null); // scenario_id being generated
   const [activeDraft, setActiveDraft] = useState(null);   // draft to show in modal
+  const [gridQuery, setGridQuery] = useState("");
+  const [updatingStatus, setUpdatingStatus] = useState(null);
+  const [publishTarget, setPublishTarget] = useState(null);
 
   const [showCreateModal, setShowCreateModal] = useState(false);
   // editorTarget: { scenarioId, initialScenario? } — initialScenario present right after creation
@@ -35,6 +53,7 @@ function TrainerScenarios() {
   /* stable ref so AG Grid cell renderers always see the latest handler */
   const generateRef = useRef(null);
   const editRef = useRef(null);
+  const statusRef = useRef(null);
 
   const refreshStats = useCallback(() => {
     apiFetch
@@ -78,6 +97,26 @@ function TrainerScenarios() {
 
   generateRef.current = generateDraft;
 
+  const updateScenarioStatus = useCallback(async (scenarioId, nextStatus) => {
+    setUpdatingStatus(scenarioId);
+    try {
+      const response = await apiFetch.patch(`/v1/scenario/${scenarioId}/status`, {
+        status: nextStatus,
+      });
+      setRowData((rows) =>
+        (rows || []).map((row) =>
+          row._id === scenarioId ? { ...row, status: response.data.status } : row
+        )
+      );
+    } catch (err) {
+      const detail = err.response?.data?.detail || err.message || "Status update failed";
+      alert(detail);
+    } finally {
+      setUpdatingStatus(null);
+    }
+  }, []);
+  statusRef.current = updateScenarioStatus;
+
   /* fetch trainer's scenarios with run/trainee stats on mount */
   useEffect(() => {
     refreshStats();
@@ -85,10 +124,15 @@ function TrainerScenarios() {
 
   /* called by CreateScenarioModal right after the LLM finishes generating */
   const handleScenarioCreated = useCallback((newScenario) => {
+    const scenarioId = newScenario?._id || newScenario?.id;
     setShowCreateModal(false);
     refreshStats();
+    if (!scenarioId) {
+      console.error("Created scenario missing id", newScenario);
+      return;
+    }
     // Immediately open the human-in-the-loop editor for review
-    setEditorTarget({ scenarioId: newScenario._id, initialScenario: newScenario });
+    setEditorTarget({ scenarioId, initialScenario: newScenario });
   }, [refreshStats]);
 
   const handleScenarioSaved = useCallback(() => {
@@ -154,6 +198,63 @@ function TrainerScenarios() {
         },
       },
       {
+        headerName: "Status",
+        field: "status",
+        flex: 1,
+        filter: false,
+        sortable: true,
+        minWidth: 150,
+        cellClass: "ts-status-cell",
+        cellRenderer: (params) => {
+          const current = params.value || "published";
+          const transitions = {
+            draft: ["draft"],
+            reviewed: ["reviewed", "published", "archived"],
+            published: ["published", "reviewed", "archived"],
+            archived: ["archived", "reviewed"],
+          }[current] || ["published"];
+          return (
+            <select
+              className={`ts-lifecycle-select ts-lifecycle-select--${current}`}
+              value={current}
+              disabled={current === "draft" || updatingStatus === params.data._id}
+              onChange={(event) => {
+                if (event.target.value === "published") {
+                  setPublishTarget(params.data);
+                } else {
+                  statusRef.current?.(params.data._id, event.target.value);
+                }
+              }}
+              title={current === "draft" ? "Open Edit and save the scenario to complete review" : "Change lifecycle status"}
+            >
+              {transitions.map((status) => (
+                <option key={status} value={status}>{status}</option>
+              ))}
+            </select>
+          );
+        },
+      },
+      {
+        headerName: "Audience",
+        flex: 1,
+        minWidth: 125,
+        filter: false,
+        sortable: false,
+        cellRenderer: (params) => {
+          const status = params.data.status || "published";
+          if (!["reviewed", "published"].includes(status)) return "—";
+          return (
+            <button
+              className="ts-assign-btn"
+              title={status === "published" ? "Manage assigned audience" : "Publish and assign"}
+              onClick={() => setPublishTarget(params.data)}
+            >
+              <FiSend /> {status === "published" ? "Audience" : "Publish"}
+            </button>
+          );
+        },
+      },
+      {
         headerName: "Edit",
         flex: 1,
         filter: false,
@@ -196,13 +297,23 @@ function TrainerScenarios() {
         },
       },
     ],
-    [loadingDraft]
+    [loadingDraft, updatingStatus]
   );
 
   const defaultColDef = useMemo(
-    () => ({ filter: "agTextColumnFilter", floatingFilter: true }),
+    () => ({ filter: "agTextColumnFilter", floatingFilter: false }),
     []
   );
+
+  const summary = useMemo(() => {
+    const rows = rowData ?? [];
+    return {
+      scenarios: rows.length,
+      ready: rows.filter((row) => ["reviewed", "published"].includes(row.status || "published")).length,
+      runs: rows.reduce((total, row) => total + (row.total_runs ?? 0), 0),
+      trainees: rows.reduce((total, row) => total + (row.unique_trainees ?? 0), 0),
+    };
+  }, [rowData]);
 
   if (!isTrainer) {
     return (
@@ -226,40 +337,62 @@ function TrainerScenarios() {
     <div className="trainer-scenarios">
 
       {/* ── Page header ───────────────────────────────────────────── */}
-      <div className="ts-page-header">
-        <div>
-          <p className="ts-eyebrow">TRAINER DASHBOARD</p>
-          <h1 className="ts-title">My Scenarios</h1>
-          <p className="ts-subtitle">
-            Create AI-generated scenarios, review incidents, and draft formal policies for LEA review.
-          </p>
-        </div>
-        <button className="btn btn-primary ts-create-btn" onClick={() => setShowCreateModal(true)}>
-          <FiPlus /> Create Scenario
-        </button>
-      </div>
+      <PageHeader
+        eyebrow="Trainer dashboard"
+        title="My Scenarios"
+        description="Create AI-generated scenarios, review incidents, publish exercises, and draft formal policies."
+        actions={(
+          <ProductButton variant="primary" className="ts-create-btn" onClick={() => setShowCreateModal(true)}>
+            <FiPlus /> Create Scenario
+          </ProductButton>
+        )}
+      />
 
       {/* ── Error banner ──────────────────────────────────────────── */}
       {fetchError && (
-        <div className="ts-error-banner">
-          ⚠ {fetchError}
-        </div>
+        <StatePanel
+          icon={FiAlertTriangle}
+          tone="danger"
+          title="Scenario catalog unavailable"
+          description={fetchError}
+          compact
+        />
       )}
 
+      <div className="ts-summary-grid">
+        <article><FiLayers /><div><span>Scenarios</span><strong>{summary.scenarios}</strong></div></article>
+        <article><FiCheckCircle /><div><span>Ready</span><strong>{summary.ready}</strong></div></article>
+        <article><FiActivity /><div><span>Completed runs</span><strong>{summary.runs}</strong></div></article>
+        <article><FiUsers /><div><span>Unique trainees</span><strong>{summary.trainees}</strong></div></article>
+      </div>
+
       {/* ── Scenarios table ────────────────────────────────────────── */}
-      <div
-        className="ag-theme-material ts-grid"
-      >
-        <AgGridReact
-          rowData={rowData}
-          columnDefs={columnDefs}
-          defaultColDef={defaultColDef}
-          rowHeight={54}
-          pagination
-          paginationPageSize={20}
-          paginationPageSizeSelector={[10, 20, 50]}
-          overlayLoadingTemplate={`<span class="ts-loading-overlay">Loading scenarios…</span>`}
-        />
+      <div className="ts-catalog-panel">
+        <div className="ts-catalog-toolbar">
+          <div><span>Scenario library</span><strong>Operational catalog</strong></div>
+          <label className="ts-search">
+            <FiSearch />
+            <input
+              value={gridQuery}
+              onChange={(event) => setGridQuery(event.target.value)}
+              placeholder="Search scenarios"
+              aria-label="Search scenarios"
+            />
+          </label>
+        </div>
+        <div className="ag-theme-material ts-grid">
+          <AgGridReact
+            rowData={rowData}
+            columnDefs={columnDefs}
+            defaultColDef={defaultColDef}
+            quickFilterText={gridQuery}
+            rowHeight={50}
+            pagination
+            paginationPageSize={20}
+            paginationPageSizeSelector={[10, 20, 50]}
+            overlayLoadingTemplate={`<span class="ts-loading-overlay">Loading scenarios…</span>`}
+          />
+        </div>
       </div>
 
       {/* ── Global generating indicator ────────────────────────────── */}
@@ -293,6 +426,28 @@ function TrainerScenarios() {
           initialScenario={editorTarget.initialScenario}
           onClose={() => setEditorTarget(null)}
           onSaved={handleScenarioSaved}
+        />
+      )}
+
+      {publishTarget && (
+        <PublishScenarioModal
+          scenario={publishTarget}
+          onClose={() => setPublishTarget(null)}
+          onPublished={(publishedScenario) => {
+            setRowData((rows) =>
+              (rows || []).map((row) =>
+                row._id === publishTarget._id
+                  ? {
+                      ...row,
+                      status: publishedScenario.status,
+                      assignment_scope: publishedScenario.assignment_scope,
+                      assignment_targets: publishedScenario.assignment_targets,
+                    }
+                  : row
+              )
+            );
+            setPublishTarget(null);
+          }}
         />
       )}
     </div>

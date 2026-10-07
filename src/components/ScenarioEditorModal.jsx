@@ -13,9 +13,12 @@ import {
   FiTarget,
   FiLayers,
   FiEdit3,
+  FiDatabase,
+  FiInfo,
 } from "react-icons/fi";
 import Swal from "sweetalert2";
 import apiFetch from "../service/api_client";
+import { StatusBadge } from "./ui/ProductUI";
 import "./styles/ScenarioEditorModal.css";
 
 const BLANK_INCIDENT = {
@@ -37,6 +40,10 @@ function cloneIncidents(context) {
     expected_actions:
       inc.expected_actions && inc.expected_actions.length > 0 ? [...inc.expected_actions] : [""],
   }));
+}
+
+function scorePercent(value) {
+  return Math.round(Math.max(0, Math.min(1, Number(value) || 0)) * 100);
 }
 
 /**
@@ -85,6 +92,18 @@ export default function ScenarioEditorModal({ scenarioId, initialScenario, onClo
   }, []);
 
   const isNewlyGenerated = Boolean(initialScenario);
+  const provenance = scenario?.ai_provenance;
+  const provenanceSources = useMemo(() => {
+    const unique = new Map();
+    for (const source of provenance?.sources || []) {
+      const name = source.document_name || "Unknown source";
+      const existing = unique.get(name);
+      if (!existing || Number(source.score || 0) > Number(existing.score || 0)) {
+        unique.set(name, source);
+      }
+    }
+    return [...unique.values()].sort((a, b) => Number(b.score || 0) - Number(a.score || 0)).slice(0, 6);
+  }, [provenance]);
 
   /* ── Incident field helpers ─────────────────────────────────────────── */
   function updateField(idx, field, value) {
@@ -216,6 +235,18 @@ export default function ScenarioEditorModal({ scenarioId, initialScenario, onClo
                 {isNewlyGenerated && <span className="sem-badge-new">Human-in-the-loop</span>}
               </p>
               <h2 className="sem-title">{scenario?.scenario_name || "Loading…"}</h2>
+              {scenario?.status && (
+                <StatusBadge
+                  tone={{
+                    draft: "warning",
+                    reviewed: "info",
+                    published: "success",
+                    archived: "neutral",
+                  }[scenario.status]}
+                >
+                  {scenario.status}
+                </StatusBadge>
+              )}
             </div>
           </div>
           <button className="sem-close-btn" onClick={handleCloseAttempt} title="Close">
@@ -257,6 +288,60 @@ export default function ScenarioEditorModal({ scenarioId, initialScenario, onClo
                 </button>
               </div>
             </div>
+
+            <details className="sem-provenance" defaultOpen={isNewlyGenerated}>
+              <summary>
+                <span><FiDatabase /> AI provenance</span>
+                {provenance
+                  ? <StatusBadge tone={provenance.used_fallback ? "warning" : "ai"}>{provenance.used_fallback ? "Fallback" : "RAG grounded"}</StatusBadge>
+                  : <StatusBadge tone="neutral">Legacy scenario</StatusBadge>}
+              </summary>
+              {provenance ? (
+                <div className="sem-provenance-body">
+                  <div className="sem-provenance-metrics">
+                    <div>
+                      <span>Calibration confidence</span>
+                      <strong>{scorePercent(provenance.calibration_score)}%</strong>
+                    </div>
+                    <div>
+                      <span>Generation mode</span>
+                      <strong>{provenance.generation_mode || (provenance.used_fallback ? "Legacy fallback" : "Structured")}</strong>
+                    </div>
+                    <div>
+                      <span>Sector</span>
+                      <strong>{provenance.sector || "General"}</strong>
+                    </div>
+                    <div>
+                      <span>Generated</span>
+                      <strong>{provenance.generated_at ? new Date(provenance.generated_at).toLocaleString() : "Unknown"}</strong>
+                    </div>
+                  </div>
+                  <div className="sem-provenance-sources">
+                    <p>Reference sources ({provenance.calibration_sources_count ?? provenanceSources.length})</p>
+                    {provenanceSources.length > 0 ? provenanceSources.map((source) => (
+                      <div key={`${source.document_name}-${source.chunk_id || ""}`}>
+                        <span>{source.document_name}</span>
+                        <strong>{scorePercent(source.score)}%</strong>
+                      </div>
+                    )) : (
+                      <span className="sem-provenance-empty"><FiInfo /> No RAG source matches were returned.</span>
+                    )}
+                  </div>
+                  {(provenance.fallback_reason || provenance.retrieval_used_fallback) && (
+                    <div className="sem-provenance-warning">
+                      <FiInfo />
+                      <span>
+                        {provenance.fallback_reason || "Advanced retrieval reranking was unavailable; standard retrieval was used."}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="sem-provenance-empty sem-provenance-empty--legacy">
+                  <FiInfo /> This scenario predates provenance tracking. Its content and availability are unchanged.
+                </div>
+              )}
+            </details>
 
             <div className="sem-body">
               {incidents.map((inc, idx) => {

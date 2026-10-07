@@ -5,7 +5,9 @@
 }
 
 .main {
-  background-color: var(--color-bg);
+  background:
+    radial-gradient(circle at 75% -20%, rgba(79, 140, 255, 0.055), transparent 34%),
+    var(--color-bg);
   flex: 1;
   display: flex;
   justify-content: center;
@@ -22,5 +24,8 @@
 }
 
 @media (max-width: 768px) {
-  .side-bar { display: none; }
+  .main {
+    padding-bottom: 72px;
+    border-left: 0;
+  }
 }

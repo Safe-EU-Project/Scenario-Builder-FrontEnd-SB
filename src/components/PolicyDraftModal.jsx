@@ -63,19 +63,6 @@ function body(text) {
     spacing: { after: 80 },
   });
 }
-function leaInput(text) {
-  return new Paragraph({
-    children: [
-      new TextRun({
-        text: text || "",
-        size: 22,
-        bold: true,
-        color: "C0392B",
-      }),
-    ],
-    spacing: { after: 60 },
-  });
-}
 function numbered(items = []) {
   return items.map(
     (item, i) =>
@@ -483,10 +470,10 @@ async function downloadDocx(draft) {
    UI SUB-COMPONENTS
    ══════════════════════════════════════════════════════════════════════════ */
 
-function Section({ icon: Icon, label, accent, children }) {
+function Section({ icon: Icon, label, children }) {
   return (
-    <div className="pd-section" style={{ borderLeftColor: accent }}>
-      <h3 className="pd-section-title" style={{ color: accent }}>
+    <div className="pd-section">
+      <h3 className="pd-section-title">
         {Icon && <Icon />}
         {label}
       </h3>

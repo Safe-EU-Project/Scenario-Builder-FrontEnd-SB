@@ -1,0 +1,95 @@
+.scenario-catalog {
+  width: min(100%, 1180px);
+  height: 100%;
+  padding: clamp(1rem, 3vw, 2rem);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.scenario-catalog-header {
+  padding: 1.4rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  background:
+    linear-gradient(115deg, rgba(79, 140, 255, 0.08), transparent 50%),
+    var(--color-surface-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.scenario-catalog-header p {
+  margin-bottom: 0.25rem;
+  color: var(--color-primary);
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.scenario-catalog-header h1 {
+  font-size: 1.45rem;
+  letter-spacing: -0.025em;
+}
+
+.scenario-catalog-header > div:first-child > span {
+  color: var(--color-text-secondary);
+  font-size: 0.82rem;
+}
+
+.scenario-catalog-status {
+  min-width: 165px;
+  padding: 0.7rem 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.scenario-catalog-status > svg { color: var(--color-primary); font-size: 1.1rem; }
+.scenario-catalog-status > div { display: flex; flex-direction: column; }
+.scenario-catalog-status strong { color: var(--color-text); font: 700 1rem/1 var(--font-mono); }
+.scenario-catalog-status span { color: var(--color-text-muted); font-size: 0.64rem; }
+
+.scenario-catalog-grid {
+  width: 100%;
+  min-height: 460px;
+  flex: 1;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.scenario-launch-btn {
+  height: 34px;
+  padding: 0 0.7rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  color: #ffffff;
+  background: var(--color-primary);
+  border: 0;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.72rem;
+  font-weight: 750;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.scenario-launch-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 7px 18px rgba(79, 140, 255, 0.24);
+}
+
+@media (max-width: 640px) {
+  .scenario-catalog { padding: 0.75rem; }
+  .scenario-catalog-header { align-items: flex-start; flex-direction: column; }
+  .scenario-catalog-status { min-width: 0; width: 100%; }
+}

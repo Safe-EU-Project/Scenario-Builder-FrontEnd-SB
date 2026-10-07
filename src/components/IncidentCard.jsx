@@ -21,7 +21,7 @@ export default function IncidentCard({ exercise }) {
         </div>
 
         {exercise.inject && (
-          <div>
+          <div className="inject-block">
             <h3>Inject</h3>
             <p>{exercise.inject}</p>
           </div>
