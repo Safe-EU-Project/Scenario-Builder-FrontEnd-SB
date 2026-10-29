@@ -81,6 +81,14 @@ export default function CreateScenarioModal({ onClose, onCreated }) {
   }, []);
 
   const isValid = title.trim().length >= 4 && description.trim().length >= 20;
+  const missingRequirements = [
+    title.trim().length < 4
+      ? `title: ${Math.max(0, 4 - title.trim().length)} more character${4 - title.trim().length === 1 ? "" : "s"}`
+      : null,
+    description.trim().length < 20
+      ? `description: ${Math.max(0, 20 - description.trim().length)} more character${20 - description.trim().length === 1 ? "" : "s"}`
+      : null,
+  ].filter(Boolean);
 
   async function handleGenerate() {
     if (!isValid || submitting) return;
@@ -249,8 +257,8 @@ export default function CreateScenarioModal({ onClose, onCreated }) {
               <FiZap /> Generate Scenario
             </button>
             {!isValid && (
-              <p className="csm-hint" style={{ margin: 0, width: "100%" }}>
-                Need title ≥ 4 characters and description ≥ 20 characters.
+              <p className="csm-validation-hint" role="status">
+                Complete to generate: {missingRequirements.join(" · ")}.
               </p>
             )}
           </div>

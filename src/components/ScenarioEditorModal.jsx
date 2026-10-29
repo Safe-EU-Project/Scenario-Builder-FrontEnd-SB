@@ -292,9 +292,13 @@ export default function ScenarioEditorModal({ scenarioId, initialScenario, onClo
             <details className="sem-provenance" defaultOpen={isNewlyGenerated}>
               <summary>
                 <span><FiDatabase /> AI provenance</span>
-                {provenance
-                  ? <StatusBadge tone={provenance.used_fallback ? "warning" : "ai"}>{provenance.used_fallback ? "Fallback" : "RAG grounded"}</StatusBadge>
-                  : <StatusBadge tone="neutral">Legacy scenario</StatusBadge>}
+                {!provenance
+                  ? <StatusBadge tone="neutral">Legacy scenario</StatusBadge>
+                  : provenance.used_fallback
+                    ? <StatusBadge tone="warning">Fallback</StatusBadge>
+                    : (provenance.calibration_sources_count ?? provenanceSources.length) > 0
+                      ? <StatusBadge tone="ai">RAG grounded</StatusBadge>
+                      : <StatusBadge tone="warning">No RAG sources</StatusBadge>}
               </summary>
               {provenance ? (
                 <div className="sem-provenance-body">

@@ -235,6 +235,27 @@
   text-overflow: clip !important;
 }
 
+/* AG Grid gives every cell a line-height equal to the row height (~45px). Controls inherited it,
+   so buttons grew taller than the row and the status text sank below the select's bottom edge.
+   Centre the control cells with flexbox and give the controls their own line-height. */
+.ts-grid .ag-cell:has(.ts-lifecycle-select, .ts-assign-btn, .ts-edit-btn, .ts-draft-btn, .ts-generating) {
+  display: flex;
+  align-items: center;
+  line-height: normal;
+}
+
+.ts-lifecycle-select,
+.ts-assign-btn,
+.ts-edit-btn,
+.ts-draft-btn {
+  line-height: 1.2;
+}
+
+.ts-lifecycle-select {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
 .ts-lifecycle-select:disabled { opacity: 0.55; cursor: wait; }
 .ts-lifecycle-select--draft {
   color: var(--color-warning);
